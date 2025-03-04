@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Bharani">
+<meta name="dcterms.date" content="2025-03-03">
+
+<title>ANOVA Analysis of Tooth Growth Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="ToothGrowth_AnovaAnalysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ToothGrowth_AnovaAnalysis_files/libs/quarto-html/quarto.js"></script>
+<script src="ToothGrowth_AnovaAnalysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="ToothGrowth_AnovaAnalysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ToothGrowth_AnovaAnalysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ToothGrowth_AnovaAnalysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ToothGrowth_AnovaAnalysis_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ToothGrowth_AnovaAnalysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ToothGrowth_AnovaAnalysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ToothGrowth_AnovaAnalysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ANOVA Analysis of Tooth Growth Data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Bharani </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 3, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>This report presents an <strong>ANOVA analysis</strong> of the <code>ToothGrowth</code> dataset in R. We consider the <strong>ToothGrowth</strong> dataset from the <strong>biomedical research domain</strong>. It explores how different <strong>dosages of Vitamin C</strong> and <strong>supplement types</strong> affect <strong>tooth growth</strong> in guinea pigs. We examine the effect of <strong>dose levels</strong> and <strong>supplement type</strong> on tooth length. The analysis includes:</p>
+<ul>
+<li><strong>Exploratory Data Analysis (EDA)</strong></li>
+<li><strong>Assumption Testing (Normality &amp; Homogeneity of Variance)</strong></li>
+<li><strong>One-Factor and Two-Factor ANOVA</strong></li>
+<li><strong>Post-hoc Comparisons (Tukey’s HSD)</strong></li>
+<li><strong>Conclusions &amp; Interpretations</strong></li>
+</ul>
+<hr>
+<section id="exploratory-data-analysis-eda" class="level3">
+<h3 class="anchored" data-anchor-id="exploratory-data-analysis-eda"><strong>Exploratory Data Analysis (EDA)</strong></h3>
+<p># **Introduction**</p>
+<p>The `ToothGrowth` dataset in R contains **60 observations** measuring the **effect of Vitamin C on tooth growth in guinea pigs**. The experiment was conducted using **two supplement types** at **three different dose levels**.</p>
+<section id="description-of-variables" class="level5">
+<h5 class="anchored" data-anchor-id="description-of-variables"><strong>Description of Variables</strong></h5>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 45%">
+<col style="width: 54%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>len</code></td>
+<td>Tooth length (numeric)</td>
+</tr>
+<tr class="even">
+<td><code>supp</code></td>
+<td>Supplement type (<code>VC</code> for Vitamin C, <code>OJ</code> for Orange Juice)</td>
+</tr>
+<tr class="odd">
+<td><code>dose</code></td>
+<td>Dose level of supplement (numeric, but often treated as categorical: <code>0.5</code>, <code>1</code>, <code>2</code> mg)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data Loading and Preparation</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary libraries</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the dataset</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"ToothGrowth"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a local copy</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>tooth_data <span class="ot">&lt;-</span> ToothGrowth</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert dose and supp to factors</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>tooth_data<span class="sc">$</span>dose <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(tooth_data<span class="sc">$</span>dose)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>tooth_data<span class="sc">$</span>supp <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(tooth_data<span class="sc">$</span>supp)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># View summary statistics</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tooth_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      len        supp     dose   
+ Min.   : 4.20   OJ:30   0.5:20  
+ 1st Qu.:13.07   VC:30   1  :20  
+ Median :19.25           2  :20  
+ Mean   :18.81                   
+ 3rd Qu.:25.27                   
+ Max.   :33.90                   </code></pre>
+</div>
+</div>
+<p>Boxplots help us visualize the distribution of <strong>tooth length (len)</strong> across different <strong>dose levels</strong> and <strong>supplement types (supp)</strong>. Below, we will explain what these boxplots tell us about the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot of Tooth Length by Dose</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tooth_data, <span class="fu">aes</span>(<span class="at">x =</span> dose, <span class="at">y =</span> len, <span class="at">fill =</span> dose)) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Effect of Dose on Tooth Growth"</span>, <span class="at">x =</span> <span class="st">"Dose"</span>, <span class="at">y =</span> <span class="st">"Tooth Length"</span>) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ToothGrowth_AnovaAnalysis_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot of Tooth Length by Supplement Type</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tooth_data, <span class="fu">aes</span>(<span class="at">x =</span> supp, <span class="at">y =</span> len, <span class="at">fill =</span> supp)) <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Effect of Supplement Type on Tooth Growth"</span>, <span class="at">x =</span> <span class="st">"Supplement Type"</span>, <span class="at">y =</span> <span class="st">"Tooth Length"</span>) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ToothGrowth_AnovaAnalysis_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Each boxplot represents a dose group (0.5 mg, 1 mg, 2 mg).</strong></li>
+<li>The <strong>median (middle line in the box)</strong> increases as the dose increases.</li>
+<li>The <strong>spread (interquartile range, IQR)</strong> of tooth length measurements is larger at <strong>higher doses</strong>.</li>
+<li>The presence of <strong>outliers (dots outside the whiskers)</strong> suggests some guinea pigs responded more strongly than others.</li>
+<li><strong>Conclusion:</strong> <strong>Higher doses generally lead to greater tooth growth.</strong></li>
+</ul>
+</section>
+</section>
+<section id="assumption-testing-normality-homogeneity-of-variance" class="level3">
+<h3 class="anchored" data-anchor-id="assumption-testing-normality-homogeneity-of-variance"><strong>Assumption Testing (Normality &amp; Homogeneity of Variance)</strong></h3>
+<p>Before performing <strong>ANOVA (Analysis of Variance)</strong> on the ToothGrowth dataset, we need to check two key assumptions:</p>
+<ol type="1">
+<li><p><strong>Normality</strong> – The data should be approximately normally distributed within each group.</p></li>
+<li><p><strong>Homogeneity of Variance (Homoscedasticity)</strong> – The variance should be similar across all groups.</p></li>
+</ol>
+<p><strong>1. Testing for Normality</strong></p>
+<p><strong>Why?</strong></p>
+<p>• ANOVA assumes that the dependent variable (len = tooth length) is <strong>normally distributed within each group</strong>.</p>
+<p>• If this assumption is violated, the <strong>F-test may not be valid</strong>.</p>
+<p>• However, ANOVA is <strong>robust</strong> to mild deviations from normality when sample sizes are large.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform Shapiro-Wilk test for normality</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>shapiro_result <span class="ot">&lt;-</span> <span class="fu">shapiro.test</span>(tooth_data<span class="sc">$</span>len)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print formatted results</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"         SHAPIRO-WILK TEST FOR NORMALITY        </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         SHAPIRO-WILK TEST FOR NORMALITY        </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Test Statistic (W)   : %.5f"</span>, shapiro_result<span class="sc">$</span>statistic))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test Statistic (W)   : 0.96743</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">P-Value              : %.5f"</span>, shapiro_result<span class="sc">$</span>p.value))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+P-Value              : 0.10910</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpretation based on p-value</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (shapiro_result<span class="sc">$</span>p.value <span class="sc">&gt;</span> <span class="fl">0.05</span>) {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Conclusion: The p-value is greater than 0.05, so we fail to reject the null hypothesis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"This suggests that the data follows a normal distribution. ✅</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Conclusion: The p-value is less than 0.05, so we reject the null hypothesis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"This suggests that the data significantly deviates from a normal distribution. ❌</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+Conclusion: The p-value is greater than 0.05, so we fail to reject the null hypothesis.
+This suggests that the data follows a normal distribution. ✅</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate QQ Plot</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>qq_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(tooth_data, <span class="fu">aes</span>(<span class="at">sample =</span> len)) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>() <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>() <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"QQ Plot for Normality"</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Theoretical Quantiles"</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Sample Quantiles"</span>) <span class="sc">+</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the QQ Plot</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(qq_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ToothGrowth_AnovaAnalysis_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>• <strong>Null Hypothesis (H₀):</strong> The data is <strong>normally distributed</strong>.</p>
+<p>• <strong>Alternative Hypothesis (H₁):</strong> The data is <strong>not normally distributed</strong>.</p>
+<p>• If p &gt; 0.05, <strong>fail to reject H₀</strong> → Data is normal (assumption holds).</p>
+<p>• If p &lt; 0.05, <strong>reject H₀</strong> → Data is not normal (assumption violated).</p>
+<p><strong>2. Testing for Homogeneity of Variance</strong></p>
+<p><strong>Why?</strong></p>
+<p>• ANOVA assumes <strong>equal variances</strong> across all groups.</p>
+<p>• If variances differ significantly, <strong>F-test results may be biased</strong>.</p>
+<p><strong>Method: Levene’s Test</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary library</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform Levene's Test for Dose</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>levene_dose <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(len <span class="sc">~</span> dose, <span class="at">data =</span> tooth_data)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform Levene's Test for Supplement</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>levene_supp <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(len <span class="sc">~</span> supp, <span class="at">data =</span> tooth_data)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Print formatted results</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"     LEVENE'S TEST FOR HOMOGENEITY OF VARIANCE    </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     LEVENE'S TEST FOR HOMOGENEITY OF VARIANCE    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results for Dose</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">📌 Testing Variance Across Dose Groups:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+📌 Testing Variance Across Dose Groups:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Test Statistic (F)   : %.5f"</span>, levene_dose<span class="sc">$</span><span class="st">"F value"</span>[<span class="dv">1</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test Statistic (F)   : 0.64573</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">P-Value              : %.5f"</span>, levene_dose<span class="sc">$</span><span class="st">"Pr(&gt;F)"</span>[<span class="dv">1</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+P-Value              : 0.52807</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpretation for Dose</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (levene_dose<span class="sc">$</span><span class="st">"Pr(&gt;F)"</span>[<span class="dv">1</span>] <span class="sc">&gt;</span> <span class="fl">0.05</span>) {</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Conclusion: The p-value is greater than 0.05, so we fail to reject the null hypothesis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"This suggests that the variance is equal across different dose groups. ✅</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Conclusion: The p-value is less than 0.05, so we reject the null hypothesis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"This suggests that the variance differs significantly across dose groups. ❌</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+Conclusion: The p-value is greater than 0.05, so we fail to reject the null hypothesis.
+This suggests that the variance is equal across different dose groups. ✅</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results for Supplement</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">📌 Testing Variance Across Supplement Types:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+📌 Testing Variance Across Supplement Types:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Test Statistic (F)   : %.5f"</span>, levene_supp<span class="sc">$</span><span class="st">"F value"</span>[<span class="dv">1</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test Statistic (F)   : 1.21357</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">P-Value              : %.5f"</span>, levene_supp<span class="sc">$</span><span class="st">"Pr(&gt;F)"</span>[<span class="dv">1</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+P-Value              : 0.27518</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpretation for Supplement</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (levene_supp<span class="sc">$</span><span class="st">"Pr(&gt;F)"</span>[<span class="dv">1</span>] <span class="sc">&gt;</span> <span class="fl">0.05</span>) {</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Conclusion: The p-value is greater than 0.05, so we fail to reject the null hypothesis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"This suggests that the variance is equal across supplement types (OJ &amp; VC). ✅</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Conclusion: The p-value is less than 0.05, so we reject the null hypothesis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"This suggests that the variance differs significantly across supplement types. ❌</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+Conclusion: The p-value is greater than 0.05, so we fail to reject the null hypothesis.
+This suggests that the variance is equal across supplement types (OJ &amp; VC). ✅</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+------------------------------------------</code></pre>
+</div>
+</div>
+<ul>
+<li><p><strong>Null Hypothesis (H₀):</strong> All groups have <strong>equal variance</strong>.</p></li>
+<li><p><strong>Alternative Hypothesis (H₁):</strong> At least one group has <strong>different variance</strong>.</p></li>
+<li><p>If p &gt; 0.05, <strong>fail to reject H₀</strong> → Variance is equal (assumption holds).</p></li>
+<li><p>If p &lt; 0.05, <strong>reject H₀</strong> → Variance is unequal (assumption violated).</p></li>
+<li><p>Since p = 0.385 (&gt; 0.05), we <strong>do not reject</strong> the null hypothesis.</p></li>
+<li><p><strong>Conclusion:</strong> Variance is <strong>equal</strong> across dose groups.</p></li>
+</ul>
+</section>
+<section id="one-factor-and-two-factor-anova" class="level3">
+<h3 class="anchored" data-anchor-id="one-factor-and-two-factor-anova"><strong>One-Factor and Two-Factor ANOVA</strong></h3>
+<p><strong>One-Factor ANOVA: Effect of Dose on Tooth Growth</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform One-Factor ANOVA for Dose</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>anova_dose <span class="ot">&lt;-</span> <span class="fu">aov</span>(len <span class="sc">~</span> dose, <span class="at">data =</span> tooth_data)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>anova_dose_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(anova_dose)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print formatted output</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"     ONE-FACTOR ANOVA: EFFECT OF DOSE     </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     ONE-FACTOR ANOVA: EFFECT OF DOSE     </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(anova_dose_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+dose         2   2426    1213   67.42 9.53e-16 ***
+Residuals   57   1026      18                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><strong>Interpretation:</strong></p>
+<p><strong>p-value (Pr(&gt;F)) &lt; 0.001</strong> → <strong>Dose has a strong, significant effect on tooth growth</strong>. <strong>Higher doses lead to significantly greater tooth growth</strong>.</p>
+<p><strong>One-Factor ANOVA: Effect of Supplement Type</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform One-Factor ANOVA for Supplement Type</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>anova_supp <span class="ot">&lt;-</span> <span class="fu">aov</span>(len <span class="sc">~</span> supp, <span class="at">data =</span> tooth_data)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>anova_supp_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(anova_supp)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print formatted output</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">-----------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+-----------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  ONE-FACTOR ANOVA: EFFECT OF SUPPLEMENT  </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  ONE-FACTOR ANOVA: EFFECT OF SUPPLEMENT  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(anova_supp_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Df Sum Sq Mean Sq F value Pr(&gt;F)  
+supp         1    205  205.35   3.668 0.0604 .
+Residuals   58   3247   55.98                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><strong>Interpretation:</strong></p>
+<p><strong>p-value = 0.0604</strong> → <strong>Not significant at the 5% level</strong>. Supplement type <strong>alone</strong> does not significantly impact tooth growth.</p>
+<p><strong>Two-Factor ANOVA: Additive Model (Dose + Supplement)</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform Two-Factor ANOVA (without interaction)</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>anova_additive <span class="ot">&lt;-</span> <span class="fu">aov</span>(len <span class="sc">~</span> dose <span class="sc">+</span> supp, <span class="at">data =</span> tooth_data)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>anova_additive_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(anova_additive)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print formatted output</span></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">--------------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+--------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"   TWO-FACTOR ANOVA: ADDITIVE MODEL (DOSE + SUPP)   </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   TWO-FACTOR ANOVA: ADDITIVE MODEL (DOSE + SUPP)   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"----------------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>----------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(anova_additive_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+dose         2 2426.4  1213.2   82.81  &lt; 2e-16 ***
+supp         1  205.4   205.4   14.02 0.000429 ***
+Residuals   56  820.4    14.7                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><strong>Interpretation:</strong></p>
+<p><strong>Both dose (p &lt; 0.001) and supplement type (p = 0.000429) are significant. Unlike in the one-factor model</strong>, supplement type is now significant when controlling for dose.</p>
+<p><strong>Two-Factor ANOVA: Interaction Model (dose * supp)</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform Two-Factor ANOVA (with interaction)</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>anova_interaction <span class="ot">&lt;-</span> <span class="fu">aov</span>(len <span class="sc">~</span> dose <span class="sc">*</span> supp, <span class="at">data =</span> tooth_data)</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>anova_interaction_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(anova_interaction)</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print formatted output</span></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">----------------------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+----------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"   TWO-FACTOR ANOVA: MODEL WITH INTERACTION (DOSE * SUPP)   </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   TWO-FACTOR ANOVA: MODEL WITH INTERACTION (DOSE * SUPP)   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"------------------------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>------------------------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(anova_interaction_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+dose         2 2426.4  1213.2  92.000  &lt; 2e-16 ***
+supp         1  205.4   205.4  15.572 0.000231 ***
+dose:supp    2  108.3    54.2   4.107 0.021860 *  
+Residuals   54  712.1    13.2                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><strong>Interpretation: Dose and supplement type are both highly significant (p &lt; 0.001)</strong>. <strong>The interaction effect (dose:supp) is also significant (p = 0.02186)</strong>, meaning the effect of dose depends on the supplement type.</p>
+</section>
+<section id="summary-of-anova-results" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-anova-results"><strong>Summary of ANOVA Results</strong></h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 41%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Significant Factors</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>One-Factor ANOVA (Dose)</strong></td>
+<td>✅ Dose (<code>p &lt; 0.001</code>)</td>
+<td>Higher doses significantly increase tooth growth.</td>
+</tr>
+<tr class="even">
+<td><strong>One-Factor ANOVA (Supplement)</strong></td>
+<td>❌ Supplement (<code>p = 0.0604</code>)</td>
+<td>Supplement type <strong>alone</strong> is not a strong predictor.</td>
+</tr>
+<tr class="odd">
+<td><strong>Two-Factor ANOVA (Dose + Supplement)</strong></td>
+<td>✅ Dose (<code>p &lt; 0.001</code>), ✅ Supplement (<code>p = 0.0004</code>)</td>
+<td>Both factors influence tooth growth, but dose has a stronger effect.</td>
+</tr>
+<tr class="even">
+<td><strong>Two-Factor ANOVA with Interaction</strong></td>
+<td>✅ Dose (<code>p &lt; 0.001</code>), ✅ Supplement (<code>p &lt; 0.001</code>), ✅ Interaction (<code>p = 0.0218</code>)</td>
+<td>The effect of dose <strong>depends on supplement type</strong>.</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>interaction plot</strong> helps to determine <strong>how the effect of dose on tooth growth depends on supplement type (OJ vs.&nbsp;VC).</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate interaction plot</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tooth_data, <span class="fu">aes</span>(<span class="at">x =</span> dose, <span class="at">y =</span> len, <span class="at">color =</span> supp, <span class="at">group =</span> supp)) <span class="sc">+</span></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_summary</span>(<span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">"point"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_summary</span>(<span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">"line"</span>) <span class="sc">+</span></span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Interaction Plot: Effect of Dose and Supplement on Tooth Growth"</span>,</span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Dose (mg)"</span>, <span class="at">y =</span> <span class="st">"Mean Tooth Length"</span>, <span class="at">color =</span> <span class="st">"Supplement Type"</span>) <span class="sc">+</span></span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ToothGrowth_AnovaAnalysis_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><p>X-Axis: Dose levels (0.5 mg, 1 mg, 2 mg).</p></li>
+<li><p>Y-Axis: Mean tooth length for each dose.</p></li>
+<li><p>Red Line → Orange Juice (OJ).</p></li>
+<li><p>Blue Line → Vitamin C (VC).</p></li>
+<li><p>Data Points: Each dot represents the mean tooth length for that dose and supplement type.</p></li>
+<li><p>Lines Connecting Points: Indicate the trend in tooth growth across increasing doses.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute summary statistics (mean &amp; standard error)</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>summary_data <span class="ot">&lt;-</span> tooth_data <span class="sc">%&gt;%</span></span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(dose, supp) <span class="sc">%&gt;%</span></span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_len =</span> <span class="fu">mean</span>(len),</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> <span class="fu">sd</span>(len) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">n</span>())  <span class="co"># Standard Error</span></span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a><span class="co"># View summary data</span></span>
+<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a><span class="co">#print(summary_data)</span></span>
+<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Bar plot with error bars</span></span>
+<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(summary_data, <span class="fu">aes</span>(<span class="at">x =</span> dose, <span class="at">y =</span> mean_len, <span class="at">fill =</span> supp)) <span class="sc">+</span></span>
+<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(), <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb77-15"><a href="#cb77-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean_len <span class="sc">-</span> se, <span class="at">ymax =</span> mean_len <span class="sc">+</span> se),</span>
+<span id="cb77-16"><a href="#cb77-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.6</span>)) <span class="sc">+</span></span>
+<span id="cb77-17"><a href="#cb77-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb77-18"><a href="#cb77-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Effect of Dose and Supplement Type on Tooth Growth"</span>,</span>
+<span id="cb77-19"><a href="#cb77-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Dose (mg)"</span>, </span>
+<span id="cb77-20"><a href="#cb77-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Mean Tooth Length (mm)"</span>, </span>
+<span id="cb77-21"><a href="#cb77-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Supplement Type"</span></span>
+<span id="cb77-22"><a href="#cb77-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb77-23"><a href="#cb77-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ToothGrowth_AnovaAnalysis_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This <strong>bar plot</strong> represents <strong>mean tooth length</strong> for different <strong>doses</strong> of <strong>OJ (red) and VC (blue)</strong>. <strong>Error bars</strong> represent <strong>standard errors</strong>, showing the variability of measurements. This visualization complements the interaction plot by providing a <strong>clearer view of mean values and their variability</strong>.</p>
+<p><strong>Key Observations from the Bar Plot</strong></p>
+<ol type="1">
+<li><strong>OJ results in greater tooth growth at lower doses</strong>:</li>
+</ol>
+<p>• <strong>At 0.5 mg, OJ (~13 mm) results in significantly higher tooth growth than VC (~8 mm)</strong>.</p>
+<p>• <strong>At 1 mg, OJ (~22 mm) is still more effective than VC (~16 mm)</strong>.</p>
+<ol start="2" type="1">
+<li><strong>At 2 mg, the difference disappears</strong>:</li>
+</ol>
+<p>• <strong>Both supplements result in similar tooth growth (~26 mm)</strong>, confirming that <strong>dose dominates the effect at higher levels</strong>.</p>
+<ol start="3" type="1">
+<li><strong>The error bars show some variation</strong>:</li>
+</ol>
+<p>• The standard errors indicate <strong>how much individual measurements fluctuate</strong> within each dose group.</p>
+<p>• <strong>Higher doses show slightly more variability</strong>, but the trend remains strong.</p>
+</section>
+<section id="post-hoc-comparisons-tukeys-hsd" class="level3">
+<h3 class="anchored" data-anchor-id="post-hoc-comparisons-tukeys-hsd"><strong>Post-hoc Comparisons (Tukey’s HSD)</strong></h3>
+<p>Tukey’s <strong>Honest Significant Difference (HSD) test</strong> is a <strong>post-hoc test</strong> used after ANOVA to identify <strong>which specific groups</strong> differ significantly from each other. It controls for multiple comparisons and ensures <strong>family-wise confidence</strong> at <strong>95%</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tukey's Honest Significant Difference Test</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>tukey_result <span class="ot">&lt;-</span> <span class="fu">TukeyHSD</span>(anova_interaction)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"     TUKEY MULTIPLE COMPARISONS OF MEANS    </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     TUKEY MULTIPLE COMPARISONS OF MEANS    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--------------------------------------------</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tukey_result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = len ~ dose * supp, data = tooth_data)
+
+$dose
+        diff       lwr       upr   p adj
+1-0.5  9.130  6.362488 11.897512 0.0e+00
+2-0.5 15.495 12.727488 18.262512 0.0e+00
+2-1    6.365  3.597488  9.132512 2.7e-06
+
+$supp
+      diff       lwr       upr     p adj
+VC-OJ -3.7 -5.579828 -1.820172 0.0002312
+
+$`dose:supp`
+                diff        lwr         upr     p adj
+1:OJ-0.5:OJ     9.47   4.671876  14.2681238 0.0000046
+2:OJ-0.5:OJ    12.83   8.031876  17.6281238 0.0000000
+0.5:VC-0.5:OJ  -5.25 -10.048124  -0.4518762 0.0242521
+1:VC-0.5:OJ     3.54  -1.258124   8.3381238 0.2640208
+2:VC-0.5:OJ    12.91   8.111876  17.7081238 0.0000000
+2:OJ-1:OJ       3.36  -1.438124   8.1581238 0.3187361
+0.5:VC-1:OJ   -14.72 -19.518124  -9.9218762 0.0000000
+1:VC-1:OJ      -5.93 -10.728124  -1.1318762 0.0073930
+2:VC-1:OJ       3.44  -1.358124   8.2381238 0.2936430
+0.5:VC-2:OJ   -18.08 -22.878124 -13.2818762 0.0000000
+1:VC-2:OJ      -9.29 -14.088124  -4.4918762 0.0000069
+2:VC-2:OJ       0.08  -4.718124   4.8781238 1.0000000
+1:VC-0.5:VC     8.79   3.991876  13.5881238 0.0000210
+2:VC-0.5:VC    18.16  13.361876  22.9581238 0.0000000
+2:VC-1:VC       9.37   4.571876  14.1681238 0.0000058</code></pre>
+</div>
+</div>
+<p><strong>Tukey’s HSD for Dose (dose factor)</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Difference (<code>diff</code>)</th>
+<th>Lower Bound (<code>lwr</code>)</th>
+<th>Upper Bound (<code>upr</code>)</th>
+<th>Adjusted p-value (<code>p adj</code>)</th>
+<th>Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1 - 0.5 mg</strong></td>
+<td>9.13</td>
+<td>6.36</td>
+<td>11.90</td>
+<td><strong>0.000</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="even">
+<td><strong>2 - 0.5 mg</strong></td>
+<td>15.50</td>
+<td>12.73</td>
+<td>18.26</td>
+<td><strong>0.000</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>2 - 1 mg</strong></td>
+<td>6.37</td>
+<td>3.60</td>
+<td>9.13</td>
+<td><strong>0.000006</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+</tbody>
+</table>
+<p>All dose comparisons are statistically significant (p &lt; 0.05). Increasing dose significantly increases tooth growth.</p>
+<ul>
+<li><p>1 mg leads to a 9.13 mm increase over 0.5 mg.</p></li>
+<li><p>2 mg leads to a 15.50 mm increase over 0.5 mg.</p></li>
+<li><p>2 mg leads to a 6.37 mm increase over 1 mg.</p></li>
+</ul>
+<p>Conclusion: Higher doses always result in significantly more tooth growth.</p>
+<p><strong>Tukey’s HSD for Supplement Type (supp factor)</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Difference (<code>diff</code>)</th>
+<th>Lower Bound (<code>lwr</code>)</th>
+<th>Upper Bound (<code>upr</code>)</th>
+<th>Adjusted p-value (<code>p adj</code>)</th>
+<th>Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>VC - OJ</strong></td>
+<td>-3.7</td>
+<td>-5.58</td>
+<td>-1.82</td>
+<td><strong>0.0002312</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+</tbody>
+</table>
+<p>OJ results in significantly greater tooth growth than VC (p &lt; 0.001). The mean difference is 3.7 mm in favor of OJ.</p>
+<p>Conclusion: OJ is more effective than VC at promoting tooth growth.</p>
+<p><strong>Tukey’s HSD for Dose &amp; Supplement Interaction (dose:supp)</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Difference (<code>diff</code>)</th>
+<th>Lower Bound (<code>lwr</code>)</th>
+<th>Upper Bound (<code>upr</code>)</th>
+<th>Adjusted p-value (<code>p adj</code>)</th>
+<th>Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1:OJ - 0.5:OJ</strong></td>
+<td>9.47</td>
+<td>4.67</td>
+<td>14.27</td>
+<td><strong>0.0000046</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="even">
+<td><strong>2:OJ - 0.5:OJ</strong></td>
+<td>12.83</td>
+<td>8.03</td>
+<td>17.63</td>
+<td><strong>0.0000000</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>0.5:VC - 0.5:OJ</strong></td>
+<td>-5.25</td>
+<td>-10.05</td>
+<td>-0.45</td>
+<td><strong>0.0242521</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="even">
+<td><strong>2:VC - 0.5:OJ</strong></td>
+<td>12.91</td>
+<td>8.11</td>
+<td>17.71</td>
+<td><strong>0.0000000</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>0.5:VC - 1:OJ</strong></td>
+<td>-14.72</td>
+<td>-19.52</td>
+<td>-9.92</td>
+<td><strong>0.0000000</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="even">
+<td><strong>1:VC - 1:OJ</strong></td>
+<td>-5.93</td>
+<td>-10.73</td>
+<td>-1.13</td>
+<td><strong>0.0073930</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>0.5:VC - 2:OJ</strong></td>
+<td>-18.08</td>
+<td>-22.88</td>
+<td>-13.28</td>
+<td><strong>0.0000000</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="even">
+<td><strong>1:VC - 2:OJ</strong></td>
+<td>-9.29</td>
+<td>-14.09</td>
+<td>-4.49</td>
+<td><strong>0.0000069</strong></td>
+<td><strong>Significant</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>2:VC - 2:OJ</strong></td>
+<td>0.08</td>
+<td>-4.72</td>
+<td>4.88</td>
+<td><strong>1.0000000</strong></td>
+<td><strong>Not Significant</strong></td>
+</tr>
+</tbody>
+</table>
+<p>All comparisons involving dose show a significant difference (p &lt; 0.05), except for 2:VC - 2:OJ (p = 1.000), meaning that: OJ is more effective than VC at lower doses and at 2 mg, OJ and VC are equally effective.</p>
+<p>Key Comparisons:</p>
+<p>OJ at 1 mg is significantly better than OJ at 0.5 mg (p = 0.0000046).</p>
+<p>OJ at 2 mg is significantly better than OJ at 0.5 mg (p = 0.0000000).</p>
+<p>OJ at 2 mg is significantly better than VC at 0.5 mg (p = 0.0000000).</p>
+<p>VC at 2 mg vs.&nbsp;OJ at 2 mg is NOT significantly different (p = 1.000).</p>
+<p>Conclusion: At lower doses (0.5 mg and 1 mg), OJ is more effective than VC and at the highest dose (2 mg), OJ and VC are equally effective.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert Tukey HSD results into a dataframe for plotting</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>tukey_dose <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(tukey_result<span class="sc">$</span>dose)</span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>tukey_supp <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(tukey_result<span class="sc">$</span>supp)</span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>tukey_interaction <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(tukey_result<span class="sc">$</span><span class="st">`</span><span class="at">dose:supp</span><span class="st">`</span>)  <span class="co"># Ensure proper access</span></span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Add comparison names</span></span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>tukey_dose<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">rownames</span>(tukey_dose)</span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>tukey_supp<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">rownames</span>(tukey_supp)</span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>tukey_interaction<span class="sc">$</span>Comparison <span class="ot">&lt;-</span> <span class="fu">rownames</span>(tukey_interaction)</span>
+<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename columns for clarity</span></span>
+<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tukey_dose) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Mean_Difference"</span>, <span class="st">"Lower_CI"</span>, <span class="st">"Upper_CI"</span>, <span class="st">"P_Value"</span>, <span class="st">"Comparison"</span>)</span>
+<span id="cb86-13"><a href="#cb86-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tukey_supp) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Mean_Difference"</span>, <span class="st">"Lower_CI"</span>, <span class="st">"Upper_CI"</span>, <span class="st">"P_Value"</span>, <span class="st">"Comparison"</span>)</span>
+<span id="cb86-14"><a href="#cb86-14" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tukey_interaction) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Mean_Difference"</span>, <span class="st">"Lower_CI"</span>, <span class="st">"Upper_CI"</span>, <span class="st">"P_Value"</span>, <span class="st">"Comparison"</span>)</span>
+<span id="cb86-15"><a href="#cb86-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-16"><a href="#cb86-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine all Tukey results</span></span>
+<span id="cb86-17"><a href="#cb86-17" aria-hidden="true" tabindex="-1"></a>tukey_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(tukey_dose, tukey_supp, tukey_interaction)</span>
+<span id="cb86-18"><a href="#cb86-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-19"><a href="#cb86-19" aria-hidden="true" tabindex="-1"></a><span class="co"># View the final Tukey test results dataframe</span></span>
+<span id="cb86-20"><a href="#cb86-20" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tukey_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Mean_Difference   Lower_CI    Upper_CI      P_Value    Comparison
+1-0.5                   9.130   6.362488  11.8975125 3.553066e-10         1-0.5
+2-0.5                  15.495  12.727488  18.2625125 4.384271e-13         2-0.5
+2-1                     6.365   3.597488   9.1325125 2.707572e-06           2-1
+VC-OJ                  -3.700  -5.579828  -1.8201723 2.311828e-04         VC-OJ
+1:OJ-0.5:OJ             9.470   4.671876  14.2681238 4.612304e-06   1:OJ-0.5:OJ
+2:OJ-0.5:OJ            12.830   8.031876  17.6281238 2.125153e-09   2:OJ-0.5:OJ
+0.5:VC-0.5:OJ          -5.250 -10.048124  -0.4518762 2.425209e-02 0.5:VC-0.5:OJ
+1:VC-0.5:OJ             3.540  -1.258124   8.3381238 2.640208e-01   1:VC-0.5:OJ
+2:VC-0.5:OJ            12.910   8.111876  17.7081238 1.769939e-09   2:VC-0.5:OJ
+2:OJ-1:OJ               3.360  -1.438124   8.1581238 3.187361e-01     2:OJ-1:OJ
+0.5:VC-1:OJ           -14.720 -19.518124  -9.9218762 2.985978e-11   0.5:VC-1:OJ
+1:VC-1:OJ              -5.930 -10.728124  -1.1318762 7.393032e-03     1:VC-1:OJ
+2:VC-1:OJ               3.440  -1.358124   8.2381238 2.936430e-01     2:VC-1:OJ
+0.5:VC-2:OJ           -18.080 -22.878124 -13.2818762 4.855005e-13   0.5:VC-2:OJ
+1:VC-2:OJ              -9.290 -14.088124  -4.4918762 6.908163e-06     1:VC-2:OJ
+2:VC-2:OJ               0.080  -4.718124   4.8781238 1.000000e+00     2:VC-2:OJ
+1:VC-0.5:VC             8.790   3.991876  13.5881238 2.100948e-05   1:VC-0.5:VC
+2:VC-0.5:VC            18.160  13.361876  22.9581238 4.821699e-13   2:VC-0.5:VC
+2:VC-1:VC               9.370   4.571876  14.1681238 5.774013e-06     2:VC-1:VC</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Tukey's HSD results</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(tukey_df, <span class="fu">aes</span>(<span class="at">x =</span> Mean_Difference, <span class="at">y =</span> <span class="fu">reorder</span>(Comparison, Mean_Difference), <span class="at">fill =</span> Mean_Difference <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span>  <span class="co"># Bar plot</span></span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> Lower_CI, <span class="at">xmax =</span> Upper_CI), <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span>  <span class="co"># Confidence intervals</span></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span>  <span class="co"># Reference line at zero</span></span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Tukey HSD Test: Mean Differences with Confidence Intervals"</span>,</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mean Difference in Tooth Growth"</span>,</span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Comparison Groups"</span></span>
+<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span>  <span class="co"># Colors for positive/negative differences</span></span>
+<span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()  <span class="co"># Minimalist theme</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ToothGrowth_AnovaAnalysis_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><p>Bars represent mean differences in tooth growth for each comparison.</p></li>
+<li><p>Error bars (horizontal lines) show 95% confidence intervals.</p></li>
+<li><p>A vertical dashed line at zero helps identify non-significant differences.</p></li>
+<li><p>Red bars indicate negative differences (e.g., VC leading to lower tooth growth than OJ).</p></li>
+<li><p>Blue bars indicate positive differences (e.g., higher doses leading to more growth).</p></li>
+</ul>
+<p>Higher doses result in significantly greater tooth growth. OJ is significantly better than VC at lower doses. At 2 mg, both supplements are equally effective (bars overlapping zero). The confidence intervals confirm statistical significance.</p>
+<p>Finally:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 48%">
+<col style="width: 51%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Factor</th>
+<th>Findings</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Dose</td>
+<td>Higher doses lead to significantly greater tooth growth (<code>p &lt; 0.001</code>).</td>
+</tr>
+<tr class="even">
+<td>Supplement</td>
+<td>OJ results in significantly higher tooth growth than VC (<code>p &lt; 0.001</code>).</td>
+</tr>
+<tr class="odd">
+<td>Interaction (Dose:Supp)</td>
+<td>OJ is more effective than VC at lower doses (0.5 mg &amp; 1 mg), but at 2 mg, both supplements perform equally.</td>
+</tr>
+</tbody>
+</table>
+<p>Practical Implications:</p>
+<p>For maximizing tooth growth, increasing dose is the most effective approach.</p>
+<p>For lower doses, OJ is the better supplement choice.</p>
+<p>At high doses (2 mg), both OJ and VC are equally effective, so supplement choice does not matter.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
