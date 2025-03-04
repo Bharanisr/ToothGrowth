@@ -12,8 +12,7 @@ execute:
 
 # Introduction
 
-This report presents an **ANOVA analysis** of the `ToothGrowth` dataset in R.
-We consider the **ToothGrowth** dataset from the **biomedical research domain**. It explores how different **dosages of Vitamin C** and **supplement types** affect **tooth growth** in guinea pigs. We examine the effect of **dose levels** and **supplement type** on tooth length. The analysis includes:
+This report presents an **ANOVA analysis** of the `ToothGrowth` dataset in R. We consider the **ToothGrowth** dataset from the **biomedical research domain**. It explores how different **dosages of Vitamin C** and **supplement types** affect **tooth growth** in guinea pigs. We examine the effect of **dose levels** and **supplement type** on tooth length. The analysis includes:
 
 -   **Exploratory Data Analysis (EDA)**
 -   **Assumption Testing (Normality & Homogeneity of Variance)**
@@ -32,7 +31,7 @@ The \`ToothGrowth\` dataset in R contains \*\*60 observations\*\* measuring the 
 ##### **Description of Variables**
 
 | Variable | Description |
-|---------------------------------|---------------------------------------|
+|----|----|
 | `len` | Tooth length (numeric) |
 | `supp` | Supplement type (`VC` for Vitamin C, `OJ` for Orange Juice) |
 | `dose` | Dose level of supplement (numeric, but often treated as categorical: `0.5`, `1`, `2` mg) |
@@ -286,7 +285,7 @@ print(anova_interaction_summary)
 ### **Summary of ANOVA Results**
 
 | Model | Significant Factors | Interpretation |
-|------------------|------------------------------|------------------------|
+|----|----|----|
 | **One-Factor ANOVA (Dose)** | ✅ Dose (`p < 0.001`) | Higher doses significantly increase tooth growth. |
 | **One-Factor ANOVA (Supplement)** | ❌ Supplement (`p = 0.0604`) | Supplement type **alone** is not a strong predictor. |
 | **Two-Factor ANOVA (Dose + Supplement)** | ✅ Dose (`p < 0.001`), ✅ Supplement (`p = 0.0004`) | Both factors influence tooth growth, but dose has a stronger effect. |
@@ -347,21 +346,21 @@ This **bar plot** represents **mean tooth length** for different **doses** of **
 
 **Key Observations from the Bar Plot**
 
-1.	**OJ results in greater tooth growth at lower doses**:
+1.  **OJ results in greater tooth growth at lower doses**:
 
-•	**At 0.5 mg, OJ (\~13 mm) results in significantly higher tooth growth than VC (\~8 mm)**.
+• **At 0.5 mg, OJ (\~13 mm) results in significantly higher tooth growth than VC (\~8 mm)**.
 
-•	**At 1 mg, OJ (\~22 mm) is still more effective than VC (\~16 mm)**.
+• **At 1 mg, OJ (\~22 mm) is still more effective than VC (\~16 mm)**.
 
-2.	**At 2 mg, the difference disappears**:
+2.  **At 2 mg, the difference disappears**:
 
-•	**Both supplements result in similar tooth growth (\~26 mm)**, confirming that **dose dominates the effect at higher levels**.
+• **Both supplements result in similar tooth growth (\~26 mm)**, confirming that **dose dominates the effect at higher levels**.
 
-3.	**The error bars show some variation**:
+3.  **The error bars show some variation**:
 
-•	The standard errors indicate **how much individual measurements fluctuate** within each dose group.
+• The standard errors indicate **how much individual measurements fluctuate** within each dose group.
 
-•	**Higher doses show slightly more variability**, but the trend remains strong.
+• **Higher doses show slightly more variability**, but the trend remains strong.
 
 ### **Post-hoc Comparisons (Tukey's HSD)**
 
@@ -381,7 +380,7 @@ print(tukey_result)
 **Tukey’s HSD for Dose (dose factor)**
 
 | Comparison | Difference (`diff`) | Lower Bound (`lwr`) | Upper Bound (`upr`) | Adjusted p-value (`p adj`) | Significance |
-|------------|------------|------------|------------|------------|------------|
+|----|----|----|----|----|----|
 | **1 - 0.5 mg** | 9.13 | 6.36 | 11.90 | **0.000** | **Significant** |
 | **2 - 0.5 mg** | 15.50 | 12.73 | 18.26 | **0.000** | **Significant** |
 | **2 - 1 mg** | 6.37 | 3.60 | 9.13 | **0.000006** | **Significant** |
@@ -399,7 +398,7 @@ Conclusion: Higher doses always result in significantly more tooth growth.
 **Tukey’s HSD for Supplement Type (supp factor)**
 
 | Comparison | Difference (`diff`) | Lower Bound (`lwr`) | Upper Bound (`upr`) | Adjusted p-value (`p adj`) | Significance |
-|------------|------------|------------|------------|------------|------------|
+|----|----|----|----|----|----|
 | **VC - OJ** | -3.7 | -5.58 | -1.82 | **0.0002312** | **Significant** |
 
 OJ results in significantly greater tooth growth than VC (p \< 0.001). The mean difference is 3.7 mm in favor of OJ.
@@ -409,7 +408,7 @@ Conclusion: OJ is more effective than VC at promoting tooth growth.
 **Tukey’s HSD for Dose & Supplement Interaction (dose:supp)**
 
 | Comparison | Difference (`diff`) | Lower Bound (`lwr`) | Upper Bound (`upr`) | Adjusted p-value (`p adj`) | Significance |
-|------------|------------|------------|------------|------------|------------|
+|----|----|----|----|----|----|
 | **1:OJ - 0.5:OJ** | 9.47 | 4.67 | 14.27 | **0.0000046** | **Significant** |
 | **2:OJ - 0.5:OJ** | 12.83 | 8.03 | 17.63 | **0.0000000** | **Significant** |
 | **0.5:VC - 0.5:OJ** | -5.25 | -10.05 | -0.45 | **0.0242521** | **Significant** |
@@ -480,12 +479,12 @@ ggplot(tukey_df, aes(x = Mean_Difference, y = reorder(Comparison, Mean_Differenc
 
 -   Blue bars indicate positive differences (e.g., higher doses leading to more growth).
 
-Higher doses result in significantly greater tooth growth.	OJ is significantly better than VC at lower doses. At 2 mg, both supplements are equally effective (bars overlapping zero). The confidence intervals confirm statistical significance.
+Higher doses result in significantly greater tooth growth. OJ is significantly better than VC at lower doses. At 2 mg, both supplements are equally effective (bars overlapping zero). The confidence intervals confirm statistical significance.
 
 Finally:
 
 | Factor | Findings |
-|-----------------------------------|-------------------------------------|
+|----|----|
 | Dose | Higher doses lead to significantly greater tooth growth (`p < 0.001`). |
 | Supplement | OJ results in significantly higher tooth growth than VC (`p < 0.001`). |
 | Interaction (Dose:Supp) | OJ is more effective than VC at lower doses (0.5 mg & 1 mg), but at 2 mg, both supplements perform equally. |
@@ -497,4 +496,3 @@ For maximizing tooth growth, increasing dose is the most effective approach.
 For lower doses, OJ is the better supplement choice.
 
 At high doses (2 mg), both OJ and VC are equally effective, so supplement choice does not matter.
-
